@@ -1,0 +1,33 @@
+1) Router -
+gigabit 0/0/0 : IP - 10.10.10.1
+gigabit 0/0/1 : IP - 192.168.0.1 
+
+2)PCO> desktop >Ipconfig 
+  IP - 192.168.0.2
+  default gateway - 192.168.0.1(same as router)
+
+3)PC1> desktop >Ipconfig 
+  IP - 192.168.0.3
+  default gateway - 192.168.0.1(same as router)
+
+4)server
+  IP - 10.10.10.2
+  default gateway - 10.10.10.1
+
+5)server > services > FTP > UserPass
+
+6) PCO > text editor > create text file 
+
+7) open cmd in PCO . run commands 
+   ping server 10.10.10.2
+   FTP 10.10.10.2
+username:
+password:
+put filename.txt 
+dir 
+
+
+8) similarly open PC1 cmd and run commands 
+   ftp 10.10.10.2
+   get filename.txt
+   dir 
