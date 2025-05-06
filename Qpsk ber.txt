@@ -1,0 +1,44 @@
+clear
+N = 10^6; % Number of bits
+rand('state', 100); % Initialize rand
+randn('state', 200); % Initialize randn
+
+% Transmitter
+ip = rand(1, N) > 0.5; % Generate random bits
+ipMod = 2*ip - 1;      % BPSK mapping: 0 -> -1, 1 -> 1 (for reference)
+
+% QPSK Modulation (2 bits per symbol)
+ip_bit_pairs = reshape(ip, 2, N/2); % Group into pairs
+s = (2*ip_bit_pairs(1,:) - 1) + 1j*(2*ip_bit_pairs(2,:) - 1); % QPSK: I + jQ
+
+% AWGN Noise
+n = 1/sqrt(2) * (randn(1, N/2) + 1j*randn(1, N/2)); % Noise vector
+
+Eb_N0_dB = -3:10; % Eb/N0 range
+for ii = 1:length(Eb_N0_dB)
+    % SNR conversion: Eb/N0 -> Es/N0 (since 1 symbol = 2 bits)
+    y = s + 10^(-Eb_N0_dB(ii)/20) * n; % Add noise
+
+    % Receiver - Decision
+    ipHat_real = real(y) > 0;
+    ipHat_imag = imag(y) > 0;
+    ipHat = reshape([ipHat_real; ipHat_imag], 1, N);
+
+    % Error count
+    nErr(ii) = size(find(ip - ipHat), 2);
+end
+
+simBer = nErr/N;
+theoryBer = erfc(sqrt(10.^(Eb_N0_dB/10))) / 2;
+
+% Plot
+figure
+semilogy(Eb_N0_dB, theoryBer, 'b.-');
+hold on
+semilogy(Eb_N0_dB, simBer, 'mx-');
+grid on
+axis([-3 10 10^-5 0.5])
+legend('Theory', 'Simulation');
+xlabel('Eb/No, dB');
+ylabel('Bit Error Rate');
+title('Bit error probability curve for QPSK modulation');
